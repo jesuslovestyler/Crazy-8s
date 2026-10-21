@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>Crazy 8s</title>
+    <style>
+      :root {
+        --gold: #e3b94e;
+        --gold-deep: #c9a227;
+        --gold-soft: rgba(227, 185, 78, 0.16);
+        --cream: #f5eeda;
+        --ink: #17130a;
+        --felt-1: #17573a;
+        --felt-2: #0a2e1f;
+        --page-bg: #060f0b;
+        --card-w: 64px;
+        --card-h: 92px;
+        --red: #c0272d;
+        --black: #1d2430;
+      }
+      * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--page-bg);
+        color: var(--cream);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .page {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 14px 14px 40px;
+      }
+
+      /* ---------- top bar ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .home-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--gold);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        border: 1px solid rgba(227, 185, 78, 0.55);
+        border-radius: 999px;
+        padding: 7px 14px;
+        background: rgba(227, 185, 78, 0.07);
+      }
+      .home-pill:active { background: rgba(227, 185, 78, 0.2); }
+      .brand {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 22px;
+        letter-spacing: 0.4px;
+        color: var(--cream);
+      }
+      .brand .eight { color: var(--gold); }
+
+      /* ---------- felt table ---------- */
+      .table-wrap {
+        background: radial-gradient(ellipse 120% 90% at 50% 30%, var(--felt-1) 0%, var(--felt-2) 78%);
+        border: 1px solid rgba(227, 185, 78, 0.35);
+        border-radius: 18px;
+        padding: 14px 12px 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(0, 0, 0, 0.35);
+      }
+
+      /* ---------- start screen ---------- */
+      .start-screen { text-align: center; padding: 18px 6px 8px; }
+      .start-screen h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 44px;
+        margin: 6px 0 2px;
+        font-weight: 700;
+      }
+      .start-screen h1 .eight { color: var(--gold); }
+      .start-screen .tagline {
+        color: rgba(245, 238, 218, 0.75);
+        font-size: 16px;
+        margin: 0 0 22px;
+      }
+      .mode-btn {
+        display: block;
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 12px;
+        padding: 16px 18px;
+        font-size: 19px;
+        font-weight: 700;
+        font-family: inherit;
+        color: var(--ink);
+        background: linear-gradient(180deg, #f0cd72, var(--gold-deep));
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      }
+      .mode-btn.secondary {
+        background: rgba(245, 238, 218, 0.08);
+        color: var(--cream);
+        border: 1px solid rgba(227, 185, 78, 0.55);
+        box-shadow: none;
+      }
+      .mode-btn:active { transform: translateY(1px); }
+      .mode-btn .sub {
+        display: block;
+        font-size: 13.5px;
+        font-weight: 500;
+        opacity: 0.75;
+        margin-top: 3px;
+      }
+      .tally-box {
+        margin: 20px auto 4px;
+        max-width: 340px;
+        border: 1px solid rgba(227, 185, 78, 0.3);
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 14.5px;
+        color: rgba(245, 238, 218, 0.85);
+        background: rgba(0, 0, 0, 0.22);
+        line-height: 1.55;
+      }
+      .tally-box b { color: var(--gold); }
+
+      /* ---------- score strip ---------- */
+      .score-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        justify-content: center;
+        align-items: baseline;
+        font-size: 15px;
+        padding: 2px 4px 10px;
+        border-bottom: 1px solid rgba(227, 185, 78, 0.22);
+        margin-bottom: 10px;
+      }
+      .score-strip .who b { color: var(--gold); font-size: 17px; }
+      .score-strip .goal { color: rgba(245, 238, 218, 0.6); font-size: 13px; width: 100%; text-align: center; }
+
+      /* ---------- opponent ---------- */
+      .opp-zone { text-align: center; min-height: 74px; }
+      .opp-label { font-size: 14.5px; color: rgba(245, 238, 218, 0.85); margin-bottom: 6px; }
+      .opp-label b { color: var(--gold); }
+      .opp-hand { display: flex; justify-content: center; align-items: flex-start; height: 52px; }
+
+      /* ---------- banner & message ---------- */
+      .banner {
+        text-align: center;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 21px;
+        margin: 10px 0 2px;
+        min-height: 26px;
+        color: var(--cream);
+      }
+      .banner .turn-gold { color: var(--gold); }
+      .msg {
+        text-align: center;
+        font-size: 14.5px;
+        color: rgba(245, 238, 218, 0.8);
+        min-height: 21px;
+        margin: 2px 8px 6px;
+      }
+
+      /* ---------- center table ---------- */
+      .table-center {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 18px;
+        margin: 8px 0 4px;
+      }
+      .pile-col { text-align: center; }
+      .pile-label {
+        font-size: 12.5px;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(245, 238, 218, 0.55);
+        margin-top: 7px;
+      }
+      .stock {
+        position: relative;
+        width: var(--card-w);
+        height: var(--card-h);
+        border: none;
+        border-radius: 9px;
+        padding: 0;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .stock:disabled { cursor: default; }
+      .stock .count-badge {
+        position: absolute;
+        right: -9px;
+        top: -9px;
+        background: var(--gold);
+        color: var(--ink);
+        font-weight: 800;
+        font-size: 13.5px;
+        min-width: 26px;
+        height: 26px;
+        line-height: 26px;
+        border-radius: 999px;
+        padding: 0 5px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      }
+      .stock.can-draw { animation: pulse-ring 1.4s ease-in-out infinite; }
+      @keyframes pulse-ring {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(227, 185, 78, 0.55); }
+        50% { box-shadow: 0 0 0 9px rgba(227, 185, 78, 0); }
+      }
+      .stock.empty-stock {
+        background: rgba(245, 238, 218, 0.06);
+        border: 1.5px dashed rgba(245, 238, 218, 0.3);
+        box-shadow: none;
+      }
+      .discard-slot { position: relative; width: var(--card-w); height: var(--card-h); }
+      .discard-slot .under {
+        position: absolute; inset: 0;
+        transform: rotate(-5deg) translate(-3px, 2px);
+        opacity: 0.55;
+      }
+      .suit-badge {
+        align-self: center;
+        text-align: center;
+        border: 1px solid rgba(227, 185, 78, 0.5);
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 8px 12px;
+        min-width: 86px;
+      }
+      .suit-badge .sb-label {
+        font-size: 11px;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: rgba(245, 238, 218, 0.6);
+      }
+      .suit-badge .sb-suit { font-size: 34px; line-height: 1.15; }
+      .suit-badge .sb-note { font-size: 12px; color: rgba(245, 238, 218, 0.65); }
+
+      /* ---------- cards ---------- */
+      .card {
+        position: relative;
+        width: var(--card-w);
+        height: var(--card-h);
+        background: linear-gradient(160deg, #ffffff, #f1ecdd);
+        border-radius: 9px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+        color: var(--black);
+        flex: 0 0 auto;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .card.red { color: var(--red); }
+      .card .corner {
+        position: absolute;
+        display: flex; flex-direction: column; align-items: center;
+        line-height: 1;
+        font-weight: 700;
+        pointer-events: none;
+      }
+      .card .corner .r { font-size: 17px; }
+      .card .corner .s { font-size: 14px; margin-top: 1px; }
+      .card .corner.tl { top: 5px; left: 6px; }
+      .card .corner.br { bottom: 5px; right: 6px; transform: rotate(180deg); }
+      .card .pip {
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 40px;
+        pointer-events: none;
+      }
+      .card.is-eight { box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 0 0 2px var(--gold-deep); }
+      .card-back {
+        width: var(--card-w);
+        height: var(--card-h);
+        border-radius: 9px;
+        background:
+          repeating-linear-gradient(45deg, rgba(227, 185, 78, 0.25) 0 6px, transparent 6px 12px),
+          repeating-linear-gradient(-45deg, rgba(227, 185, 78, 0.25) 0 6px, transparent 6px 12px),
+          linear-gradient(160deg, #7c1f24, #4d1216);
+        box-shadow: inset 0 0 0 3px #f5eeda, inset 0 0 0 5px #7c1f24, 0 3px 8px rgba(0, 0, 0, 0.45);
+        flex: 0 0 auto;
+      }
+      .card-back.small { width: 36px; height: 52px; border-radius: 6px; box-shadow: inset 0 0 0 2px #f5eeda, inset 0 0 0 3.5px #7c1f24, 0 2px 5px rgba(0, 0, 0, 0.4); }
+      .card.mini { width: 40px; height: 58px; border-radius: 6px; }
+      .card.mini .corner .r { font-size: 13px; }
+      .card.mini .corner .s { font-size: 11px; }
+      .card.mini .pip { font-size: 24px; }
+
+      /* ---------- player hand ---------- */
+      .hand-zone { margin-top: 6px; }
+      .hand-label { text-align: center; font-size: 14.5px; color: rgba(245, 238, 218, 0.85); margin-bottom: 4px; }
+      .hand-label b { color: var(--gold); }
+      .hand {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px 4px 8px;
+        min-height: 118px;
+      }
+      .hand .card { cursor: pointer; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; touch-action: manipulation; }
+      .hand .card.playable { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--gold), 0 0 18px rgba(227, 185, 78, 0.55); }
+      .hand .card.dim { filter: brightness(0.55) saturate(0.6); }
+      .hand .card.drawn-one { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 0 2.5px var(--gold), 0 0 22px rgba(227, 185, 78, 0.8); }
+      .hand .card.shake { animation: shake 0.35s ease; }
+      @keyframes shake {
+        0%, 100% { margin-top: 0; }
+        25% { margin-top: -3px; }
+        75% { margin-top: 3px; }
+      }
+      .hand .card-back { cursor: default; }
+
+      .actions { text-align: center; min-height: 46px; padding-top: 2px; }
+      .pass-btn {
+        font-family: inherit;
+        font-size: 16.5px;
+        font-weight: 700;
+        color: var(--ink);
+        background: linear-gradient(180deg, #f0cd72, var(--gold-deep));
+        border: none;
+        border-radius: 999px;
+        padding: 11px 34px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      }
+      .pass-btn:active { transform: translateY(1px); }
+      .menu-btn {
+        display: block;
+        margin: 10px auto 0;
+        font-family: inherit;
+        font-size: 13.5px;
+        color: rgba(245, 238, 218, 0.55);
+        background: none;
+        border: none;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 6px 10px;
+      }
+
+      /* ---------- overlays ---------- */
+      .overlay {
+        position: fixed; inset: 0;
+        background: rgba(3, 8, 6, 0.88);
+        display: flex; align-items: center; justify-content: center;
+        padding: 18px;
+        z-index: 40;
+      }
+      .overlay[hidden] { display: none; }
+      .sheet {
+        background: linear-gradient(180deg, #123527, #0a241a);
+        border: 1px solid rgba(227, 185, 78, 0.5);
+        border-radius: 16px;
+        padding: 24px 20px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+        max-height: 88vh;
+        overflow-y: auto;
+      }
+      .sheet h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        margin: 0 0 8px;
+        font-size: 26px;
+      }
+      .sheet h2 .gold { color: var(--gold); }
+      .sheet p { margin: 6px 0; font-size: 15.5px; color: rgba(245, 238, 218, 0.88); line-height: 1.5; }
+      .sheet .big-points { font-size: 20px; color: var(--gold); font-weight: 800; }
+      .suit-row { display: flex; justify-content: center; gap: 12px; margin: 16px 0 4px; }
+      .suit-btn {
+        font-size: 38px;
+        width: 68px; height: 68px;
+        border-radius: 14px;
+        border: 1.5px solid rgba(227, 185, 78, 0.6);
+        background: #fdfbf3;
+        cursor: pointer;
+        line-height: 1;
+        font-family: inherit;
+      }
+      .suit-btn.red { color: var(--red); }
+      .suit-btn.black { color: var(--black); }
+      .suit-btn:active { transform: scale(0.95); }
+      .sheet .primary-btn {
+        display: block; width: 100%;
+        margin-top: 16px;
+        padding: 14px;
+        font-size: 17.5px; font-weight: 700;
+        font-family: inherit;
+        color: var(--ink);
+        background: linear-gradient(180deg, #f0cd72, var(--gold-deep));
+        border: none; border-radius: 11px; cursor: pointer;
+      }
+      .sheet .ghost-btn {
+        display: block; width: 100%;
+        margin-top: 10px;
+        padding: 12px;
+        font-size: 15.5px; font-weight: 600;
+        font-family: inherit;
+        color: var(--cream);
+        background: rgba(245, 238, 218, 0.07);
+        border: 1px solid rgba(227, 185, 78, 0.45); border-radius: 11px; cursor: pointer;
+      }
+      .loser-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 12px 0 2px; }
+      .handoff-icon { font-size: 40px; margin-bottom: 6px; }
+
+      /* flying card animation clone */
+      .fly-card { position: fixed; z-index: 60; pointer-events: none; margin: 0 !important; }
+
+      /* ---------- how to play ---------- */
+      .howto {
+        margin-top: 26px;
+        border-top: 1px solid rgba(227, 185, 78, 0.25);
+        padding-top: 18px;
+      }
+      .howto h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 23px;
+        margin: 0 0 10px;
+        color: var(--cream);
+      }
+      .howto p, .howto li { font-size: 15.5px; line-height: 1.6; color: rgba(245, 238, 218, 0.82); }
+      .howto ul { padding-left: 20px; margin: 8px 0; }
+      .howto li { margin-bottom: 6px; }
+      .howto b { color: var(--gold); }
+      .howto .suits-inline { font-size: 16px; }
+      footer.note {
+        margin-top: 22px;
+        text-align: center;
+        font-size: 13px;
+        color: rgba(245, 238, 218, 0.4);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .stock.can-draw { animation: none; }
+        .hand .card { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <a class="home-pill" href="https://jesuslovestyler.com/">⌂ Home</a>
+        <div class="brand">Crazy <span class="eight">8</span>s</div>
+      </header>
+
+      <div class="table-wrap">
+        <!-- ======= START SCREEN ======= -->
+        <section id="startScreen" class="start-screen">
+          <h1>Crazy <span class="eight">8</span>s</h1>
+          <p class="tagline">The classic card game. Match the suit or the rank — and an 8 is always wild.</p>
+          <button class="mode-btn" id="btnSolo">Play the Computer
+            <span class="sub">Just you against the house hand</span>
+          </button>
+          <button class="mode-btn secondary" id="btnDuo">2 Players
+            <span class="sub">Pass-and-play on this device</span>
+          </button>
+          <div class="tally-box" id="tallyBox"></div>
+        </section>
+
+        <!-- ======= GAME SCREEN ======= -->
+        <section id="gameScreen" hidden>
+          <div class="score-strip" id="scoreStrip"></div>
+
+          <div class="opp-zone">
+            <div class="opp-label" id="oppLabel"></div>
+            <div class="opp-hand" id="oppHand"></div>
+          </div>
+
+          <div class="banner" id="banner"></div>
+          <div class="msg" id="msg" aria-live="polite"></div>
+
+          <div class="table-center">
+            <div class="pile-col">
+              <button class="stock card-back" id="stockBtn" aria-label="Draw pile">
+                <span class="count-badge" id="stockCount">0</span>
+              </button>
+              <div class="pile-label">Draw</div>
+            </div>
+            <div class="pile-col">
+              <div class="discard-slot" id="discardSlot"></div>
+              <div class="pile-label">Discard</div>
+            </div>
+            <div class="suit-badge" id="suitBadge">
+              <div class="sb-label">Active suit</div>
+              <div class="sb-suit" id="sbSuit">♥</div>
+              <div class="sb-note" id="sbNote"></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="pass-btn" id="passBtn" hidden>Pass</button>
+          </div>
+
+          <div class="hand-zone">
+            <div class="hand-label" id="handLabel"></div>
+            <div class="hand" id="hand"></div>
+          </div>
+
+          <button class="menu-btn" id="menuBtn">Quit this match</button>
+        </section>
+      </div>
+
+      <!-- ======= SUIT PICKER ======= -->
+      <div class="overlay" id="suitPicker" hidden>
+        <div class="sheet">
+          <h2>Your 8 is <span class="gold">wild</span></h2>
+          <p>Choose the new active suit:</p>
+          <div class="suit-row">
+            <button class="suit-btn red" data-suit="♥" aria-label="Hearts">♥</button>
+            <button class="suit-btn red" data-suit="♦" aria-label="Diamonds">♦</button>
+            <button class="suit-btn black" data-suit="♣" aria-label="Clubs">♣</button>
+            <button class="suit-btn black" data-suit="♠" aria-label="Spades">♠</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= HANDOFF ======= -->
+      <div class="overlay" id="handoff" hidden>
+        <div class="sheet">
+          <div class="handoff-icon">🂠</div>
+          <h2 id="handoffTitle">Pass to Player 2</h2>
+          <p id="handoffText">The other hand is hidden. Tap when you're ready.</p>
+          <button class="primary-btn" id="handoffBtn">Show my cards</button>
+        </div>
+      </div>
+
+      <!-- ======= ROUND / MATCH SUMMARY ======= -->
+      <div class="overlay" id="roundModal" hidden>
+        <div class="sheet">
+          <h2 id="roundTitle">Round over</h2>
+          <p id="roundDetail"></p>
+          <p class="big-points" id="roundPoints"></p>
+          <div id="loserWrap">
+            <p style="margin-top:12px" id="loserLabel"></p>
+            <div class="loser-cards" id="loserCards"></div>
+          </div>
+          <p id="roundScore" style="margin-top:14px"></p>
+          <button class="primary-btn" id="nextRoundBtn">Next round</button>
+          <button class="ghost-btn" id="newMatchBtn">New match</button>
+        </div>
+      </div>
+
+      <!-- ======= HOW TO PLAY ======= -->
+      <section class="howto">
+        <h2>How to play</h2>
+        <p>Each player is dealt <b>7 cards</b>. One card starts the discard pile; the rest is the draw stock.</p>
+        <ul>
+          <li>On your turn, play a card that matches the top card's <b>suit</b> or <b>rank</b>.</li>
+          <li>An <b>8 is wild</b> — it can be played on anything, and whoever plays it chooses the new active suit. <span class="suits-inline">♥ ♦ ♣ ♠</span></li>
+          <li>No matching card? Tap the <b>draw stock</b> and keep drawing until a playable card turns up. You may play that card, or <b>Pass</b> and keep it. If the stock runs out, the discard pile is reshuffled into a new stock.</li>
+          <li>The first player to empty their hand wins the round and scores the value of the cards left in the other hand: <b>8s count 50</b>, face cards <b>10</b>, aces <b>1</b>, and every other card its face value.</li>
+          <li>The round winner leads the next round. The first player to <b>250 points</b> wins the match.</li>
+        </ul>
+        <p>In <b>2 Players</b> mode, pass the device back and forth — a handoff screen keeps each hand private until its owner taps to reveal it.</p>
+      </section>
+
+      <footer class="note">A friendly game of cards — no stakes, just the win.</footer>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ================= model ================= */
+        var SUITS = ["♥", "♦", "♣", "♠"];
+        var RED = { "♥": true, "♦": true };
+        var RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+        var MATCH_TARGET = 250;
+
+        function buildDeck() {
+          var deck = [];
+          for (var s = 0; s < SUITS.length; s++) {
+            for (var r = 0; r < RANKS.length; r++) {
+              deck.push({ suit: SUITS[s], rank: RANKS[r] });
+            }
+          }
+          return deck;
+        }
+        function shuffle(a) {
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+          return a;
+        }
+        function cardValue(c) {
+          if (c.rank === "8") return 50;
+          if (c.rank === "K" || c.rank === "Q" || c.rank === "J") return 10;
+          if (c.rank === "A") return 1;
+          return parseInt(c.rank, 10);
+        }
+        function scoreHand(hand) {
+          var total = 0;
+          for (var i = 0; i < hand.length; i++) total += cardValue(hand[i]);
+          return total;
+        }
+        function cardName(c) { return c.rank + c.suit; }
+
+        /* ================= tallies (localStorage) ================= */
+        var TALLY_KEY = "crazy8s.matchTallies.v1";
+        function defaultTally() {
+          return { solo: { you: 0, computer: 0 }, duo: { p1: 0, p2: 0 } };
+        }
+        function loadTally() {
+          try {
+            var raw = localStorage.getItem(TALLY_KEY);
+            if (!raw) return defaultTally();
+            var t = JSON.parse(raw);
+            if (!t || !t.solo || !t.duo) return defaultTally();
+            return t;
+          } catch (e) { return defaultTally(); }
+        }
+        function saveTally() {
+          try { localStorage.setItem(TALLY_KEY, JSON.stringify(S.tally)); } catch (e) { /* storage unavailable: play on */ }
+        }
+
+        /* ================= state ================= */
+        var S = {
+          screen: "start",        // start | game
+          mode: null,             // solo | duo
+          players: [],            // {name, short, hand:[], score}
+          current: 0,
+          roundStarter: 0,
+          stock: [],
+          pile: [],               // discard pile; last element is the top card
+          activeSuit: null,
+          phase: "idle",          // idle | play | handoff | suitpick | drawing | roundover | matchover
+          drawnCard: null,        // card just drawn that may be played (or passed)
+          pendingEight: null,
+          busy: false,
+          passStreak: 0,
+          round: 0,
+          tally: loadTally(),
+          lastRound: null
+        };
+
+        function topCard() { return S.pile[S.pile.length - 1]; }
+        function isPlayable(card) {
+          if (!card || S.pile.length === 0) return false;
+          return card.rank === "8" || card.suit === S.activeSuit || card.rank === topCard().rank;
+        }
+        function playableCards(hand) { return hand.filter(isPlayable); }
+        function isAI(idx) { return S.mode === "solo" && idx === 1; }
+        function currentPlayer() { return S.players[S.current]; }
+        // Whose hand belongs at the bottom of the table: always the human in
+        // solo mode; the player whose turn it is in pass-and-play.
+        function viewerIdx() { return S.mode === "solo" ? 0 : S.current; }
+
+        /* ================= dom ================= */
+        function el(id) { return document.getElementById(id); }
+        var startScreen = el("startScreen"), gameScreen = el("gameScreen"),
+            scoreStrip = el("scoreStrip"), oppLabel = el("oppLabel"), oppHand = el("oppHand"),
+            banner = el("banner"), msg = el("msg"), stockBtn = el("stockBtn"),
+            stockCount = el("stockCount"), discardSlot = el("discardSlot"),
+            sbSuit = el("sbSuit"), sbNote = el("sbNote"),
+            passBtn = el("passBtn"), handLabel = el("handLabel"), handEl = el("hand"),
+            suitPicker = el("suitPicker"), handoffEl = el("handoff"),
+            roundModal = el("roundModal");
+
+        function setMsg(t) { msg.textContent = t || ""; }
+
+        function cardEl(card, opts) {
+          opts = opts || {};
+          var d = document.createElement("div");
+          d.className = "card" + (RED[card.suit] ? " red" : "") + (card.rank === "8" ? " is-eight" : "") + (opts.mini ? " mini" : "");
+          d.setAttribute("data-card", cardName(card));
+          d.innerHTML =
+            '<div class="corner tl"><span class="r">' + card.rank + '</span><span class="s">' + card.suit + "</span></div>" +
+            '<div class="pip">' + card.suit + "</div>" +
+            '<div class="corner br"><span class="r">' + card.rank + '</span><span class="s">' + card.suit + "</span></div>";
+          return d;
+        }
+        function backEl(small) {
+          var d = document.createElement("div");
+          d.className = "card-back" + (small ? " small" : "");
+          return d;
+        }
+
+        /* ================= rendering ================= */
+        function renderTally() {
+          var t = S.tally;
+          el("tallyBox").innerHTML =
+            "Matches won so far — <b>vs Computer:</b> You " + t.solo.you + " · Computer " + t.solo.computer +
+            "<br><b>2 Players:</b> Player 1 " + t.duo.p1 + " · Player 2 " + t.duo.p2;
+        }
+
+        function renderScores() {
+          var p = S.players;
+          if (p.length < 2) { scoreStrip.innerHTML = ""; return; }
+          var t = S.tally, tallyLine;
+          if (S.mode === "solo") tallyLine = "Matches won — You " + t.solo.you + " · Computer " + t.solo.computer;
+          else tallyLine = "Matches won — Player 1 " + t.duo.p1 + " · Player 2 " + t.duo.p2;
+          scoreStrip.innerHTML =
+            '<span class="who">' + p[0].name + " <b>" + p[0].score + "</b></span>" +
+            '<span class="who">' + p[1].name + " <b>" + p[1].score + "</b></span>" +
+            '<span class="goal">Round ' + S.round + " · First to " + MATCH_TARGET + " wins the match · " + tallyLine + "</span>";
+        }
+
+        function renderOpponent() {
+          var opp = S.players[1 - viewerIdx()];
+          if (!opp) { oppLabel.textContent = ""; oppHand.innerHTML = ""; return; }
+          oppLabel.innerHTML = "<b>" + opp.name + "</b> — " + opp.hand.length + (opp.hand.length === 1 ? " card" : " cards") + " left";
+          oppHand.innerHTML = "";
+          var n = opp.hand.length;
+          var show = Math.min(n, 12);
+          for (var i = 0; i < show; i++) {
+            var b = backEl(true);
+            if (i > 0) b.style.marginLeft = "-18px";
+            b.style.transform = "rotate(" + ((i - (show - 1) / 2) * 2.2) + "deg)";
+            oppHand.appendChild(b);
+          }
+        }
+
+        function renderCenter() {
+          // stock
+          stockCount.textContent = S.stock.length;
+          stockBtn.classList.toggle("empty-stock", S.stock.length === 0);
+          var canDraw = S.phase === "play" && !S.busy && !isAI(S.current) &&
+                        !S.drawnCard && playableCards(currentPlayer().hand).length === 0;
+          stockBtn.classList.toggle("can-draw", !!canDraw);
+          stockBtn.disabled = !canDraw;
+          // discard
+          discardSlot.innerHTML = "";
+          if (S.pile.length > 1) {
+            var under = cardEl(S.pile[S.pile.length - 2]);
+            under.classList.add("under");
+            discardSlot.appendChild(under);
+          }
+          if (topCard()) discardSlot.appendChild(cardEl(topCard()));
+          // active suit badge
+          sbSuit.textContent = S.activeSuit || "–";
+          sbSuit.style.color = RED[S.activeSuit] ? "#ff8a8e" : "#e8ecf4";
+          if (topCard() && topCard().rank === "8" && S.activeSuit !== topCard().suit) {
+            sbNote.textContent = "declared by the 8";
+          } else if (topCard() && topCard().rank === "8") {
+            sbNote.textContent = "an 8 — printed suit stands";
+          } else {
+            sbNote.textContent = topCard() ? "match it, the rank " + topCard().rank + ", or any 8" : "";
+          }
+          passBtn.hidden = !(S.phase === "play" && !S.busy && !isAI(S.current) && !!S.drawnCard);
+        }
+
+        function cardWidthPx() {
+          var w = Math.min(76, Math.max(54, Math.floor(window.innerWidth * 0.16)));
+          return w;
+        }
+
+        function renderHand() {
+          handEl.innerHTML = "";
+          var p = S.players[viewerIdx()];
+          if (!p) { handLabel.textContent = ""; return; }
+          handLabel.innerHTML = "<b>" + p.name + "</b> — your cards";
+          var hidden = S.phase === "handoff";
+          var n = p.hand.length;
+          if (hidden) {
+            for (var j = 0; j < n; j++) {
+              var bk = backEl(false);
+              if (j > 0) bk.style.marginLeft = "-30px";
+              handEl.appendChild(bk);
+            }
+            return;
+          }
+          // fan geometry: shrink cards as the hand grows so every card
+          // keeps an exposed, tappable middle (step >= half the card width,
+          // plus a margin for the fan's rotation)
+          var avail = Math.min(window.innerWidth - 40, 596);
+          var cw = cardWidthPx();
+          if (n > 1) cw = Math.min(cw, Math.max(36, Math.floor(((avail - 4 * (n - 1)) * 2) / (n + 1))));
+          document.documentElement.style.setProperty("--card-w", cw + "px");
+          document.documentElement.style.setProperty("--card-h", Math.round(cw * 1.42) + "px");
+          var step = n > 1 ? Math.max(20, Math.min(cw - 6, (avail - cw) / (n - 1))) : 0;
+          var mid = (n - 1) / 2;
+          var rotPer = mid > 0 ? Math.min(1.7, 10 / mid) : 0;
+          var canAct = S.phase === "play" && !S.busy && S.current === viewerIdx();
+          var plays = playableCards(p.hand);
+          p.hand.forEach(function (card, i) {
+            var c = cardEl(card);
+            if (i > 0) c.style.marginLeft = (-(cw - step)) + "px";
+            var rot = (i - mid) * rotPer;
+            var arc = Math.abs(i - mid) * 1.6;
+            var playable = canAct && isPlayable(card) && (!S.drawnCard || card === S.drawnCard);
+            c.setAttribute("role", "button");
+            c.setAttribute("aria-label", cardName(card) + (playable ? " — playable, tap to play" : ""));
+            var lift = playable ? -15 : 0;
+            c.style.transform = "rotate(" + rot + "deg) translateY(" + (arc + lift) + "px)";
+            c.style.zIndex = i + 1;
+            if (canAct) {
+              if (S.drawnCard) {
+                if (card === S.drawnCard) c.classList.add("drawn-one");
+                else c.classList.add("dim");
+              } else if (plays.length > 0) {
+                c.classList.add(playable ? "playable" : "dim");
+              }
+            }
+            c.addEventListener("click", function () { onCardTap(i, c); });
+            handEl.appendChild(c);
+          });
+        }
+
+        function renderBanner() {
+          if (S.phase === "handoff") { banner.textContent = "Pass the device…"; return; }
+          if (S.phase === "roundover" || S.phase === "matchover") { banner.textContent = ""; return; }
+          var p = currentPlayer();
+          if (!p) { banner.textContent = ""; return; }
+          if (isAI(S.current)) banner.innerHTML = "Computer is <span class='turn-gold'>thinking…</span>";
+          else if (S.mode === "solo") banner.innerHTML = "<span class='turn-gold'>Your turn</span>";
+          else banner.innerHTML = "<span class='turn-gold'>" + p.name + "'s turn</span>";
+        }
+
+        function render() {
+          renderScores();
+          renderOpponent();
+          renderBanner();
+          renderCenter();
+          renderHand();
+        }
+
+        /* ================= flow ================= */
+        function showScreen() {
+          startScreen.hidden = S.screen !== "start";
+          gameScreen.hidden = S.screen !== "game";
+          if (S.screen === "start") renderTally();
+        }
+
+        function startMatch(mode) {
+          S.mode = mode;
+          S.screen = "game";
+          S.players = mode === "solo"
+            ? [{ name: "You", hand: [], score: 0 }, { name: "Computer", hand: [], score: 0 }]
+            : [{ name: "Player 1", hand: [], score: 0 }, { name: "Player 2", hand: [], score: 0 }];
+          S.round = 0;
+          S.lastRound = null;
+          showScreen();
+          startRound(0);
+        }
+
+        function startRound(starter) {
+          var deck = shuffle(buildDeck());
+          S.players[0].hand = [];
+          S.players[1].hand = [];
+          for (var i = 0; i < 7; i++) {
+            S.players[0].hand.push(deck.pop());
+            S.players[1].hand.push(deck.pop());
+          }
+          var starterCard = deck.pop();
+          S.pile = [starterCard];
+          S.stock = deck;
+          S.activeSuit = starterCard.suit; // an 8 starter: printed suit stands
+          S.current = starter;
+          S.roundStarter = starter;
+          S.drawnCard = null;
+          S.pendingEight = null;
+          S.passStreak = 0;
+          S.busy = false;
+          S.round++;
+          roundModal.hidden = true;
+          suitPicker.hidden = true;
+          setMsg(starterCard.rank === "8"
+            ? "The starter is an 8 — its printed suit (" + starterCard.suit + ") is the active suit."
+            : "");
+          if (S.mode === "duo") {
+            beginHandoff(S.players[starter].name + " starts the round");
+          } else {
+            S.phase = "play";
+            render();
+            if (isAI(S.current)) aiTurn();
+          }
+        }
+
+        function beginHandoff(reason) {
+          S.phase = "handoff";
+          var p = currentPlayer();
+          el("handoffTitle").textContent = "Pass to " + p.name;
+          el("handoffText").textContent = (reason ? reason + ". " : "") +
+            "Hands stay hidden until " + p.name + " taps below.";
+          el("handoffBtn").textContent = "I'm " + p.name + " — show my cards";
+          handoffEl.hidden = false;
+          render();
+        }
+
+        function endTurn() {
+          S.drawnCard = null;
+          S.current = 1 - S.current;
+          // Clear the previous turn's play-by-play unless it announced an
+          // 8's declared suit, which the incoming player needs to see.
+          if (!S.lastPlayWasEight) setMsg("");
+          S.lastPlayWasEight = false;
+          if (S.mode === "duo") {
+            beginHandoff("");
+          } else {
+            S.phase = "play";
+            render();
+            if (isAI(S.current)) aiTurn();
+          }
+        }
+
+        function checkStalemate() {
+          if (S.passStreak >= 2 && S.stock.length === 0 && S.pile.length <= 1) {
+            endRoundStalemate();
+            return true;
+          }
+          return false;
+        }
+
+        /* ---------- playing cards ---------- */
+        function onCardTap(idx, cardNode) {
+          if (S.busy || S.phase !== "play" || isAI(S.current)) return;
+          var p = currentPlayer();
+          var card = p.hand[idx];
+          if (!card) return;
+          if (S.drawnCard && card !== S.drawnCard) {
+            setMsg("You just drew — play the card you drew, or tap Pass to keep it.");
+            shake(cardNode);
+            return;
+          }
+          if (!isPlayable(card)) {
+            setMsg("Can't play " + cardName(card) + " — match " + S.activeSuit + " or any " +
+              topCard().rank + " — or play an 8.");
+            shake(cardNode);
+            return;
+          }
+          if (card.rank === "8" && p.hand.length > 1) {
+            S.pendingEight = card;
+            S.phase = "suitpick";
+            suitPicker.hidden = false;
+            render();
+            return;
+          }
+          playCard(S.current, card, null, cardNode);
+        }
+
+        function shake(node) {
+          if (!node) return;
+          node.classList.remove("shake");
+          void node.offsetWidth;
+          node.classList.add("shake");
+          setTimeout(function () { node.classList.remove("shake"); }, 380);
+        }
+
+        function playCard(playerIdx, card, declaredSuit, fromNode) {
+          var p = S.players[playerIdx];
+          var ix = p.hand.indexOf(card);
+          if (ix === -1) return;
+          var fromRect = null;
+          if (fromNode && fromNode.isConnected) {
+            var rr = fromNode.getBoundingClientRect();
+            fromRect = { left: rr.left, top: rr.top, width: rr.width, height: rr.height };
+            var snapshot = fromNode.cloneNode(true);
+            snapshot.removeAttribute("role");
+            snapshot.removeAttribute("aria-label");
+            snapshot.setAttribute("aria-hidden", "true");
+          }
+          p.hand.splice(ix, 1);
+          S.pile.push(card);
+          S.activeSuit = card.rank === "8" ? (declaredSuit || card.suit) : card.suit;
+          S.drawnCard = null;
+          S.passStreak = 0;
+          S.lastPlayWasEight = card.rank === "8";
+          var finish = function () {
+            S.busy = false;
+            if (p.hand.length === 0) { endRound(playerIdx); return; }
+            if (playerIdx === S.current) endTurn();
+            else render();
+          };
+          if (fromRect) {
+            S.busy = true;
+            render();
+            animateFly(snapshot, fromRect, finish);
+          } else {
+            render();
+            finish();
+          }
+          if (card.rank === "8") {
+            setMsg(p.name + " played an 8 — the active suit is now " + S.activeSuit + ".");
+          }
+        }
+
+        function animateFly(clone, r1, done) {
+          try {
+            var target = discardSlot.querySelector(".card") || discardSlot;
+            var r2 = target.getBoundingClientRect();
+            clone.classList.add("fly-card");
+            clone.style.left = r1.left + "px";
+            clone.style.top = r1.top + "px";
+            clone.style.width = r1.width + "px";
+            clone.style.height = r1.height + "px";
+            clone.style.transform = "none";
+            document.body.appendChild(clone);
+            var dx = r2.left + r2.width / 2 - (r1.left + r1.width / 2);
+            var dy = r2.top + r2.height / 2 - (r1.top + r1.height / 2);
+            requestAnimationFrame(function () {
+              clone.style.transition = "transform 0.38s ease, opacity 0.38s ease";
+              clone.style.transform = "translate(" + dx + "px," + dy + "px) rotate(6deg)";
+              clone.style.opacity = "0.35";
+            });
+            setTimeout(function () { clone.remove(); done(); }, 400);
+          } catch (e) { done(); }
+        }
+
+        /* ---------- drawing ---------- */
+        function drawOne() {
+          if (S.stock.length === 0) {
+            if (S.pile.length > 1) {
+              var top = S.pile.pop();
+              S.stock = shuffle(S.pile);
+              S.pile = [top];
+              setMsg("The stock ran out — the discard pile was reshuffled into a new stock.");
+            } else {
+              return null;
+            }
+          }
+          return S.stock.pop();
+        }
+
+        function sleep(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
+
+        async function humanDraw() {
+          if (S.busy || S.phase !== "play" || isAI(S.current) || S.drawnCard) return;
+          var p = currentPlayer();
+          if (playableCards(p.hand).length > 0) return;
+          S.busy = true;
+          S.phase = "drawing";
+          render();
+          var drawn = 0;
+          while (true) {
+            var c = drawOne();
+            if (!c) {
+              S.busy = false;
+              S.phase = "play";
+              S.passStreak++;
+              setMsg("No cards left to draw — your turn passes.");
+              render();
+              await sleep(900);
+              if (!checkStalemate()) endTurn();
+              return;
+            }
+            p.hand.push(c);
+            drawn++;
+            render();
+            await sleep(330);
+            if (isPlayable(c)) {
+              S.drawnCard = c;
+              S.busy = false;
+              S.phase = "play";
+              setMsg(drawn === 1
+                ? "You drew " + cardName(c) + " — it's playable. Tap it to play, or Pass to keep it."
+                : "After " + drawn + " cards, " + cardName(c) + " is playable. Tap it to play, or Pass to keep it.");
+              render();
+              return;
+            }
+          }
+        }
+
+        function humanPass() {
+          if (S.busy || S.phase !== "play" || isAI(S.current) || !S.drawnCard) return;
+          setMsg(currentPlayer().name + " keeps the drawn card and passes.");
+          S.passStreak++;
+          if (!checkStalemate()) endTurn();
+        }
+
+        /* ---------- computer ---------- */
+        function aiBestSuit(hand) {
+          var counts = {};
+          hand.forEach(function (c) { counts[c.suit] = (counts[c.suit] || 0) + 1; });
+          var best = SUITS[0], bestN = -1;
+          SUITS.forEach(function (s) { if ((counts[s] || 0) > bestN) { bestN = counts[s] || 0; best = s; } });
+          return best;
+        }
+
+        async function aiTurn() {
+          S.phase = "play";
+          S.busy = true;
+          renderBanner();
+          renderCenter();
+          await sleep(950);
+          if (S.screen !== "game" || !isAI(S.current)) { S.busy = false; return; }
+          var p = currentPlayer();
+          var plays = playableCards(p.hand);
+          var non8 = plays.filter(function (c) { return c.rank !== "8"; });
+          if (non8.length > 0) {
+            non8.sort(function (a, b) { return cardValue(b) - cardValue(a); });
+            S.busy = false;
+            playCard(S.current, non8[0], null, null);
+            return;
+          }
+          if (plays.length > 0) {
+            var eight = plays[0];
+            var suit = aiBestSuit(p.hand.filter(function (c) { return c !== eight; }));
+            S.busy = false;
+            playCard(S.current, eight, suit, null);
+            return;
+          }
+          // no match: draw until playable
+          var drawnAny = false;
+          while (true) {
+            var c = drawOne();
+            if (!c) {
+              S.passStreak++;
+              setMsg("Computer couldn't draw a playable card — its turn passes.");
+              S.busy = false;
+              render();
+              await sleep(700);
+              if (!checkStalemate()) endTurn();
+              return;
+            }
+            p.hand.push(c);
+            drawnAny = true;
+            render();
+            await sleep(300);
+            if (isPlayable(c)) {
+              await sleep(350);
+              S.busy = false;
+              if (c.rank === "8") playCard(S.current, c, aiBestSuit(p.hand.filter(function (x) { return x !== c; })), null);
+              else playCard(S.current, c, null, null);
+              return;
+            }
+          }
+        }
+
+        /* ---------- round / match end ---------- */
+        function endRound(winnerIdx) {
+          S.phase = "roundover";
+          var loser = 1 - winnerIdx;
+          var pts = scoreHand(S.players[loser].hand);
+          S.players[winnerIdx].score += pts;
+          var matchWon = S.players[winnerIdx].score >= MATCH_TARGET;
+          S.lastRound = {
+            winner: winnerIdx, loser: loser, points: pts,
+            loserHand: S.players[loser].hand.slice(), matchWon: matchWon
+          };
+          if (matchWon) {
+            S.phase = "matchover";
+            if (S.mode === "solo") {
+              if (winnerIdx === 0) S.tally.solo.you++; else S.tally.solo.computer++;
+            } else {
+              if (winnerIdx === 0) S.tally.duo.p1++; else S.tally.duo.p2++;
+            }
+            saveTally();
+          }
+          showRoundModal();
+          render();
+        }
+
+        function endRoundStalemate() {
+          S.phase = "roundover";
+          S.lastRound = { winner: -1, loser: -1, points: 0, loserHand: [], matchWon: false, stalemate: true };
+          showRoundModal();
+          render();
+        }
+
+        function showRoundModal() {
+          var lr = S.lastRound;
+          var w = lr.winner >= 0 ? S.players[lr.winner] : null;
+          var l = lr.loser >= 0 ? S.players[lr.loser] : null;
+          if (lr.stalemate) {
+            el("roundTitle").textContent = "Stalemate";
+            el("roundDetail").textContent = "No cards left to draw and nobody could play. The round is a draw — no points scored.";
+            el("roundPoints").textContent = "";
+            el("loserWrap").hidden = true;
+          } else if (lr.matchWon) {
+            el("roundTitle").innerHTML = "<span class='gold'>" + w.name + (S.mode === "solo" && lr.winner === 0 ? " win" : " wins") + " the match!</span>";
+            el("roundDetail").textContent = w.name + (S.mode === "solo" && lr.winner === 0 ? " emptied your" : " emptied their") +
+              " hand and reached " + w.score + " points — past the " + MATCH_TARGET + " needed to take the match.";
+            el("roundPoints").textContent = "+" + lr.points + " points from " + l.name + "'s remaining hand";
+            el("loserWrap").hidden = false;
+            el("loserLabel").textContent = l.name + "'s remaining hand (" + lr.loserHand.length + " cards, worth " + lr.points + "):";
+          } else {
+            el("roundTitle").textContent = w.name + (S.mode === "solo" && lr.winner === 0 ? " win" : " wins") + " the round";
+            el("roundDetail").textContent = w.name + " played the last card in " + (S.mode === "solo" && lr.winner === 0 ? "your" : "their") + " hand.";
+            el("roundPoints").textContent = "+" + lr.points + " points from " + l.name + "'s remaining hand";
+            el("loserWrap").hidden = false;
+            el("loserLabel").textContent = l.name + "'s remaining hand (" + lr.loserHand.length + " cards, worth " + lr.points + "):";
+          }
+          var lc = el("loserCards");
+          lc.innerHTML = "";
+          lr.loserHand.forEach(function (c) { lc.appendChild(cardEl(c, { mini: true })); });
+          el("roundScore").innerHTML = "Match score — " + S.players[0].name + " <b>" + S.players[0].score +
+            "</b> · " + S.players[1].name + " <b>" + S.players[1].score + "</b>";
+          el("nextRoundBtn").hidden = !!lr.matchWon;
+          el("nextRoundBtn").textContent = lr.stalemate ? "Next round" :
+            (lr.winner >= 0 ? "Next round — " + S.players[lr.winner].name + " leads" : "Next round");
+          el("newMatchBtn").textContent = lr.matchWon ? "Start a new match" : "New match instead";
+          roundModal.hidden = false;
+        }
+
+        /* ================= wiring ================= */
+        el("btnSolo").addEventListener("click", function () { startMatch("solo"); });
+        el("btnDuo").addEventListener("click", function () { startMatch("duo"); });
+        el("menuBtn").addEventListener("click", function () {
+          S.screen = "start";
+          S.phase = "idle";
+          S.busy = false;
+          handoffEl.hidden = true;
+          roundModal.hidden = true;
+          suitPicker.hidden = true;
+          showScreen();
+        });
+        stockBtn.addEventListener("click", humanDraw);
+        passBtn.addEventListener("click", humanPass);
+        Array.prototype.forEach.call(suitPicker.querySelectorAll(".suit-btn"), function (btn) {
+          btn.addEventListener("click", function () {
+            var suit = btn.getAttribute("data-suit");
+            var card = S.pendingEight;
+            S.pendingEight = null;
+            suitPicker.hidden = true;
+            S.phase = "play";
+            if (card) playCard(S.current, card, suit, null);
+          });
+        });
+        el("handoffBtn").addEventListener("click", function () {
+          handoffEl.hidden = true;
+          S.phase = "play";
+          setMsg("");
+          render();
+        });
+        el("nextRoundBtn").addEventListener("click", function () {
+          var lr = S.lastRound;
+          var starter = lr && lr.winner >= 0 ? lr.winner : 1 - S.roundStarter;
+          roundModal.hidden = true;
+          startRound(starter);
+        });
+        el("newMatchBtn").addEventListener("click", function () {
+          roundModal.hidden = true;
+          startMatch(S.mode);
+        });
+        window.addEventListener("resize", function () { if (S.screen === "game") renderHand(); });
+
+        showScreen();
+        renderTally();
+
+        /* Test hooks: let scripted verification drive real games. */
+        window.C8 = {
+          state: S,
+          buildDeck: buildDeck,
+          scoreHand: scoreHand,
+          cardValue: cardValue,
+          isPlayable: isPlayable,
+          playableCards: playableCards,
+          startMatch: startMatch,
+          startRound: startRound,
+          playCard: playCard,
+          humanDraw: humanDraw,
+          humanPass: humanPass,
+          drawOne: drawOne,
+          topCard: topCard
+        };
+      })();
+    </script>
+    <script data-goatcounter="https://jesuslovestyler.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  </body>
+</html>
